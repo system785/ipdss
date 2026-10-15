@@ -464,7 +464,7 @@ def jsonld(obj):
 # ---------------------------------------------------------------- head
 def head(page, schema=None):
     url = f"{BASE}/" if page["file"] == "index.html" else f"{BASE}/{page['file']}"
-    img = f"{BASE}/assets/img/people/p2.png"
+    img = f"{BASE}/assets/img/og.png"
     robots = "noindex, nofollow" if page["file"] == "404.html" else "index, follow"
     schema = schema or []
     org = {
@@ -934,7 +934,7 @@ def build_index():
 
     actions = "".join(
         f"""<a class="promo {a['cls']}" href="{a['link']}" data-reveal style="--d:{i*90}ms">
-  <img src="{ICONS}{a['icon']}-48.svg" alt="" width="46" height="46" loading="lazy">
+  <img src="{ICONS}{a['icon']}-48.svg" alt="{e(a['title'])}" width="46" height="46" loading="lazy">
   <div><span>{e(a['label'])}</span><h3>{e(a['title'])}</h3></div>
 </a>""" for i, a in enumerate(ACTIONS))
     news_cards = "".join(
@@ -1138,7 +1138,7 @@ def build_news():
 </section>"""
     actions = "".join(
         f"""<a class="promo {a['cls']}" href="{a['link']}" data-reveal style="--d:{i*80}ms">
-  <img src="{ICONS}{a['icon']}-48.svg" alt="" width="46" height="46" loading="lazy">
+  <img src="{ICONS}{a['icon']}-48.svg" alt="{e(a['title'])}" width="46" height="46" loading="lazy">
   <div><span>Акция</span><h3>{e(a['title'])}</h3></div>
 </a>""" for i, a in enumerate(ACTIONS))
     act_sec = f"""<section class="section">
@@ -1428,8 +1428,15 @@ def main():
     }
     for p in P:
         built[p["file"]] = build_product(p)
+    def optimize(html: str) -> str:
+        # фотографии отдаются в WebP (легче примерно на 79 %), PNG остаётся только для og:image
+        for stem in ("p2", "p10", "p15", "p17", "p23", "p28", "p29", "p34", "p38", "p42"):
+            html = html.replace(f"assets/img/people/{stem}.png",
+                                f"assets/img/people/{stem}.webp")
+        return html
+
     for name, html in built.items():
-        (ROOT / name).write_text(html, encoding="utf-8")
+        (ROOT / name).write_text(optimize(html), encoding="utf-8")
     (ROOT / "robots.txt").write_text(ROBOTS, encoding="utf-8")
     (ROOT / "sitemap.xml").write_text(build_sitemap(), encoding="utf-8")
     (ROOT / "README.md").write_text(README, encoding="utf-8")
