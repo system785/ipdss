@@ -337,5 +337,82 @@
     el.textContent = String(new Date().getFullYear());
   });
 
+  /* ---------- Клик по e-mail: подсказка, если окно письма не открылось ---------- */
+  var mailToast = doc.querySelector('[data-mail-toast]');
+  if (mailToast) {
+    var mtShowT = null, mtHideT = null, mtWatchT = null;
+    var mtEmail = mailToast.getAttribute('data-email') || '';
+
+    function mtHide() {
+      mailToast.classList.remove('is-show');
+      doc.body.classList.remove('mail-toast-open');
+      window.clearTimeout(mtShowT);
+      window.clearTimeout(mtHideT);
+      mtHideT = window.setTimeout(function () { mailToast.hidden = true; }, 340);
+    }
+    function mtShow() {
+      mailToast.hidden = false;
+      window.clearTimeout(mtHideT);
+      /* форсируем reflow, чтобы плавная анимация проигрывалась и в фоновой вкладке */
+      void mailToast.offsetHeight;
+      mailToast.classList.add('is-show');
+      doc.body.classList.add('mail-toast-open');
+      window.clearTimeout(mtShowT);
+      mtShowT = window.setTimeout(mtHide, 20000);
+    }
+    /* Если почтовая программа открылась, вкладка обычно теряет фокус
+       или уходит в background — тогда подсказка не нужна. */
+    function mtWatch() {
+      var opened = false;
+      function off() {
+        window.removeEventListener('blur', onBlur);
+        window.removeEventListener('visibilitychange', onVis);
+        window.clearTimeout(mtWatchT);
+      }
+      function onBlur() { opened = true; off(); }
+      function onVis() { if (doc.hidden) { opened = true; off(); } }
+      window.addEventListener('blur', onBlur);
+      window.addEventListener('visibilitychange', onVis);
+      window.clearTimeout(mtWatchT);
+      mtWatchT = window.setTimeout(function () {
+        off();
+        if (!opened) mtShow();
+      }, 1100);
+    }
+    doc.addEventListener('click', function (ev) {
+      var t = ev.target;
+      if (!t || !t.closest) return;
+      if (t.closest('a[href^="mailto:"]')) mtWatch();
+    });
+    var mtCopy = mailToast.querySelector('[data-mail-copy]');
+    if (mtCopy) {
+      mtCopy.addEventListener('click', function () {
+        function ok() {
+          mtCopy.textContent = 'Скопировано ✓';
+          mtCopy.classList.add('is-ok');
+          window.setTimeout(function () {
+            mtCopy.textContent = 'Скопировать адрес';
+            mtCopy.classList.remove('is-ok');
+          }, 3200);
+        }
+        function fallback() {
+          var ta = doc.createElement('textarea');
+          ta.value = mtEmail;
+          ta.setAttribute('readonly', '');
+          ta.style.cssText = 'position:fixed;top:-100px;opacity:0';
+          doc.body.appendChild(ta);
+          ta.select();
+          try { doc.execCommand('copy'); ok(); } catch (err) {}
+          doc.body.removeChild(ta);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(mtEmail).then(ok, fallback);
+        } else { fallback(); }
+      });
+    }
+    var mtClose = mailToast.querySelector('[data-mail-close]');
+    if (mtClose) mtClose.addEventListener('click', mtHide);
+  }
+
   onScroll();
 })();

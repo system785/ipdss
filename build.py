@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Генератор статического сайта ИП Девятова С.С. (официальный партнёр СКБ Контур)."""
 from pathlib import Path
+from urllib.parse import quote
+import hashlib
 import json
 
 ROOT = Path(__file__).resolve().parent
@@ -11,8 +13,27 @@ BRAND = "ИП Девятова С.С."
 PHONE = "+7 931 281-65-81"
 PHONE_HREF = "tel:+79312816581"
 EMAIL = "k1@ipdss.ru"
+# ссылка «написать письмо» — с готовой темой, чтобы почтовая программа
+# сразу открывала новое письмо, а не пустое окно
+SUBJ = quote("Вопрос с сайта ipdss.ru", safe="")
+EMAIL_HREF = f"mailto:{EMAIL}?subject={SUBJ}"
+GMAIL_HREF = f"https://mail.google.com/mail/?view=cm&fs=1&to={EMAIL}&su={SUBJ}"
+OUTLOOK_HREF = f"https://outlook.office.com/mail/deeplink/compose?to={EMAIL}&subject={SUBJ}"
+YANDEX_HREF = f"https://mail.yandex.ru/to/?to={EMAIL}&su={SUBJ}"
 TG = "https://t.me/kontur_ipdss"
 HOURS = "10:00–18:00, пн–пт"
+
+
+def _ver(rel):
+    """Короткий хеш файла — подставляется в URL, чтобы браузер брал свежие CSS/JS."""
+    try:
+        return hashlib.md5((ROOT / rel).read_bytes()).hexdigest()[:8]
+    except OSError:
+        return "0"
+
+
+CSS_V = _ver("assets/css/style.css")
+JS_V = _ver("assets/js/main.js")
 
 # Оригинальный логотип старого сайта (взят без изменений)
 LOGO_PATHS = (
@@ -330,7 +351,7 @@ STATS = [
     ("2300000", "", "клиентов пользуются продуктами Контура"),
     ("24306", "", "официальных партнёров СКБ Контур в России"),
     ("10532", "", "сотрудника в группе компаний Контура"),
-    ("4", "", "офиса в Санкт-Петербурге и Красном Селе"),
+    ("3", "", "офиса в Санкт-Петербурге и Красном Селе"),
 ]
 
 NEWS = [
@@ -505,7 +526,7 @@ def head(page, schema=None):
 <meta name="theme-color" content="#0A1020">
 <meta name="format-detection" content="telephone=yes">
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/style.css?v={CSS_V}">
 <script>document.documentElement.classList.remove('no-js');</script>
 {jsonld(org)}
 {''.join(jsonld(s) for s in schema)}
@@ -535,7 +556,7 @@ def header():
     </div>
     <div class="topbar__right">
       <span>{HOURS}</span>
-      <a href="mailto:{EMAIL}">{EMAIL}</a>
+      <a href="{EMAIL_HREF}">{EMAIL}</a>
       <a href="{TG}" target="_blank" rel="noopener">Telegram</a>
     </div>
   </div>
@@ -563,8 +584,24 @@ def header():
   <div class="mobile-menu__meta">
     <span>{PHONE}</span>
     <span>{HOURS}</span>
-    <a href="mailto:{EMAIL}">{EMAIL}</a>
+    <a href="{EMAIL_HREF}">{EMAIL}</a>
   </div>
+</div>
+<div class="mail-toast" data-mail-toast data-email="{EMAIL}" hidden>
+  <div class="mail-toast__ico" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+  </div>
+  <div class="mail-toast__body">
+    <strong>Открываем почтовую программу…</strong>
+    <span>Не открылось окно письма? Напишите нам одним из способов — адрес <b>{EMAIL}</b></span>
+    <div class="mail-toast__acts">
+      <button type="button" data-mail-copy>Скопировать адрес</button>
+      <a href="{GMAIL_HREF}" target="_blank" rel="noopener">Gmail</a>
+      <a href="{OUTLOOK_HREF}" target="_blank" rel="noopener">Outlook</a>
+      <a href="{YANDEX_HREF}" target="_blank" rel="noopener">Яндекс Почта</a>
+    </div>
+  </div>
+  <button type="button" class="mail-toast__x" data-mail-close aria-label="Закрыть подсказку" title="Закрыть">×</button>
 </div>
 """
 
@@ -581,7 +618,7 @@ def footer():
         <p class="footer__about">{BRAND} — официальный партнёр компании СКБ Контур с 2014 года. Электронные подписи, документооборот, бухгалтерия и сопровождение торгов для бизнеса по всей России.</p>
         <div class="footer__social">
           <a href="{TG}" target="_blank" rel="noopener" aria-label="Telegram">{ICON_TG}</a>
-          <a href="mailto:{EMAIL}" aria-label="Электронная почта"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></a>
+          <a href="{EMAIL_HREF}" aria-label="Электронная почта"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></a>
           <a href="{PHONE_HREF}" aria-label="Позвонить"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></a>
         </div>
       </div>
@@ -602,7 +639,7 @@ def footer():
       <div class="footer__contacts">
         <h4>Офис продаж</h4>
         <p><a class="footer__phone" href="{PHONE_HREF}">{PHONE}</a></p>
-        <p>{HOURS}<br><a href="mailto:{EMAIL}">{EMAIL}</a></p>
+        <p>{HOURS}<br><a href="{EMAIL_HREF}">{EMAIL}</a></p>
         <p>Красное Село: ш. Кингисеппское, 55<br>СПб: пр-кт. Юрия Гагарина, 1<br>СПб: б-р Брестский, 8</p>
         <button type="button" class="btn btn--sm" data-lead="Консультация" data-product="Консультация">{ICON_CHAT}Напишите нам</button>
       </div>
@@ -643,7 +680,7 @@ def footer():
     </form>
   </div>
 </div>
-<script src="assets/js/main.js" defer></script>
+<script src="assets/js/main.js?v={JS_V}" defer></script>
 </body>
 </html>
 """
@@ -821,7 +858,7 @@ def build_index():
     <div class="hero__top" data-reveal>
       <span class="section-eyebrow" style="color:#FF8A3D">Официальный партнёр СКБ Контур с 2014 года</span>
       <h1>Электронная подпись и сервисы Контур <span>для вашего бизнеса</span></h1>
-      <p class="hero__lead">Выпуск ЭП за 1 час, юридически значимый документооборот, бухгалтерия, ОФД и сопровождение торгов. Работаем по всей России — в четырёх офисах Санкт-Петербурга и удалённо.</p>
+      <p class="hero__lead">Выпуск ЭП за 1 час, юридически значимый документооборот, бухгалтерия, ОФД и сопровождение торгов. Работаем по всей России — в трёх офисах Санкт-Петербурга и удалённо.</p>
       {hero_buttons()}
       <div class="hero__badges">
         <span class="badge">{ICON_SHIELD}Официальный партнёр с 2014 года</span>
@@ -892,7 +929,7 @@ def build_index():
         </div>
         <div class="float-card float-card--b">
           <span class="float-card__icon">{ICON_SHIELD}</span>
-          <span><strong>4 офиса и удалённо</strong><span>Санкт-Петербург и вся Россия</span></span>
+          <span><strong>3 офиса и удалённо</strong><span>Санкт-Петербург и вся Россия</span></span>
         </div>
       </div>
     </div>
@@ -1002,7 +1039,7 @@ def build_about():
     <div class="page-hero__grid">
       <div>
         <h1>О компании ИП Девятова С. С.</h1>
-        <p class="page-hero__lead">Наша команда профессионалов под руководством Светланы Девятовой помогает с электронными подписями, отчётностью, участием в электронных торгах и проверкой контрагентов. Работаем по всей России — оффлайн в четырёх офисах и удалённо.</p>
+        <p class="page-hero__lead">Наша команда профессионалов под руководством Светланы Девятовой помогает с электронными подписями, отчётностью, участием в электронных торгах и проверкой контрагентов. Работаем по всей России — оффлайн в трёх офисах и удалённо.</p>
         <div class="btn-row" style="margin-top:1.6rem">{hero_buttons()}</div>
       </div>
       <div class="page-hero__icon"><img src="assets/img/people/p17.png" alt="Команда ИП Девятова С.С." width="240" height="330"></div>
@@ -1018,7 +1055,7 @@ def build_about():
             ("24306", "", "партнёров СКБ Контур в России"),
             ("10532", "", "сотрудника в группе компаний"),
             ("1", "", "место SaaS в России по версии CNews"),
-            ("4", "", "офиса в Санкт-Петербурге и Красном Селе"),
+            ("3", "", "офиса в Санкт-Петербурге и Красном Селе"),
         ]))
     stats_sec = f"""<section class="section section--tight">
   <div class="container"><div class="grid g-3">{stats}</div></div>
@@ -1032,7 +1069,7 @@ def build_about():
         <p class="lead">Мы помогаем предпринимателям решать задачи, которые обычно отнимают недели: получить электронную подпись, подключить электронный документооборот, сдать отчётность, пройти аккредитацию на торговой площадке и участвовать в закупках.</p>
         <ul class="check-list">
           <li>Официальный партнёр СКБ Контур с 2014 года в России</li>
-          <li>Четыре офиса в Санкт-Петербурге и Красном Селе</li>
+          <li>Три офиса в Санкт-Петербурге и Красном Селе</li>
           <li>Удалённое обслуживание клиентов по всей России</li>
           <li>Собственная техподдержка и выезд специалистов</li>
         </ul>
@@ -1090,7 +1127,7 @@ def build_contacts():
   <div class="office__meta">
     <span>{e(o['hours'])}</span>
     <a href="{PHONE_HREF}">{PHONE}</a>
-    <a href="mailto:{EMAIL}">{EMAIL}</a>
+    <a href="{EMAIL_HREF}">{EMAIL}</a>
     <a href="{o['map']}" target="_blank" rel="noopener">Открыть в Яндекс.Картах →</a>
   </div>
 </article>""" for i, o in enumerate(OFFICES))
@@ -1108,7 +1145,7 @@ def build_contacts():
         <h2>ИП Девятова Светлана Сергеевна</h2>
         <ul class="check-list">
           <li>ИНН: 632512815372</li>
-          <li>Электронная почта: <a href="mailto:{EMAIL}"><b>{EMAIL}</b></a></li>
+          <li>Электронная почта: <a href="{EMAIL_HREF}"><b>{EMAIL}</b></a></li>
           <li>Телефон отдела продаж: <a href="{PHONE_HREF}"><b>{PHONE}</b></a></li>
           <li>Telegram: <a href="{TG}" target="_blank" rel="noopener"><b>{TG.replace('https://', '')}</b></a></li>
           <li>Официальный партнёр СКБ Контур с 2014 года</li>
@@ -1174,7 +1211,7 @@ def build_privacy():
         ("Оператор обработки персональных данных",
          f"Оператором персональных данных является {FIRM}, ИНН 632512815372. Адрес для обращений: "
          "Санкт-Петербург, ш. Кингисеппское, 55, офис 335. Электронная почта: "
-         f'<a href="mailto:{EMAIL}">{EMAIL}</a>, телефон: <a href="{PHONE_HREF}">{PHONE}</a>.'),
+         f'<a href="{EMAIL_HREF}">{EMAIL}</a>, телефон: <a href="{PHONE_HREF}">{PHONE}</a>.'),
         ("Какие данные мы собираем",
          "Сайт собирает только те данные, которые вы указываете добровольно при заполнении форм: имя, номер телефона, "
          "адрес электронной почты, текст сообщения и интересующий продукт. Дополнительно автоматически собираются "
@@ -1203,7 +1240,7 @@ def build_privacy():
         ("Права субъекта персональных данных",
          "Вы вправе получить информацию об обработке своих данных, потребовать уточнения, блокирования или уничтожения "
          "недостоверных данных, отозвать согласие на обработку, а также обжаловать действия оператора в Роскомнадзоре "
-         "или в суде. Для реализации прав направьте обращение на " + f'<a href="mailto:{EMAIL}">{EMAIL}</a>' + "."),
+         "или в суде. Для реализации прав направьте обращение на " + f'<a href="{EMAIL_HREF}">{EMAIL}</a>' + "."),
         ("Использование файлов cookie",
          "Сайт использует файлы cookie для корректной работы, запоминания настроек и аналитики посещений. "
          "Cookie не содержат персональных данных и не позволяют установить личность посетителя. Вы можете удалить "

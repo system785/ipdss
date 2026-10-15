@@ -564,6 +564,39 @@ strong,b{font-weight:700}
 .cookie a{color:var(--brand);text-decoration:underline}
 .cookie button{flex:none}
 
+/* ---------- Подсказка «написать письмо» ---------- */
+.mail-toast{
+  position:fixed;left:50%;bottom:24px;z-index:130;width:min(660px,calc(100% - 44px));
+  transform:translate(-50%,18px);
+  display:flex;gap:14px;align-items:flex-start;
+  background:#0A1020;color:#fff;border:1px solid rgba(255,255,255,.16);
+  border-radius:var(--r-lg);padding:16px 42px 16px 18px;box-shadow:0 26px 60px rgba(10,16,32,.5);
+  opacity:0;visibility:hidden;
+  transition:opacity .32s ease,transform .32s cubic-bezier(.2,.8,.3,1),visibility .32s;
+}
+.mail-toast[hidden]{display:none}
+.mail-toast.is-show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.mail-toast__ico{flex:none;width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:var(--grad);box-shadow:0 8px 20px rgba(255,76,76,.32)}
+.mail-toast__ico svg{width:19px;height:19px;color:#fff}
+.mail-toast__body{min-width:0;display:flex;flex-direction:column;gap:5px}
+.mail-toast__body strong{font-size:.98rem}
+.mail-toast__body span{font-size:.85rem;line-height:1.5;color:#B7C2DE}
+.mail-toast__body b{color:#fff;white-space:nowrap}
+.mail-toast__acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.mail-toast__acts a,.mail-toast__acts button{
+  font:inherit;font-size:.82rem;font-weight:700;color:#fff;text-decoration:none;cursor:pointer;
+  border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.08);
+  border-radius:999px;padding:.44rem .9rem;
+  transition:background .2s ease,color .2s ease,transform .2s ease,border-color .2s ease;
+}
+.mail-toast__acts a:hover,.mail-toast__acts button:hover{background:#fff;color:var(--ink);border-color:#fff;transform:translateY(-2px)}
+.mail-toast__acts button.is-ok{background:var(--teal);border-color:var(--teal);color:#06281F}
+.mail-toast__x{position:absolute;top:8px;right:10px;border:0;background:none;color:#8E9AB8;font-size:1.55rem;line-height:1;cursor:pointer;transition:color .2s ease}
+.mail-toast__x:hover{color:#fff}
+/* пока открыта подсказка — прячем нижние плашки, чтобы они не накладывались */
+.mail-toast-open .cookie{transform:translateY(160%)}
+.mail-toast-open .to-top{opacity:0;visibility:hidden}
+
 /* ---------- Модальное окно заявки ---------- */
 .modal{position:fixed;inset:0;z-index:160;display:grid;place-items:center;padding:20px}
 .modal[hidden]{display:none}
@@ -639,6 +672,8 @@ strong,b{font-weight:700}
   .news-grid{grid-template-columns:1fr}
   .to-top{bottom:86px}
   .cookie{left:12px;right:12px;bottom:86px;max-width:none}
+  .mail-toast{left:12px;right:12px;bottom:96px;width:auto;transform:translateY(18px);padding:14px 40px 14px 14px}
+  .mail-toast.is-show{transform:translateY(0)}
   body{padding-bottom:72px}
 }
 @media (max-width:760px){
@@ -647,6 +682,8 @@ strong,b{font-weight:700}
   .topbar .container{align-items:flex-start}
   .topbar__left span:nth-child(2){display:none}
   .topbar__right{display:none}
+  .mail-toast__ico{display:none}
+  .mail-toast__acts a,.mail-toast__acts button{padding:.4rem .78rem;font-size:.8rem}
   .mobile-cta{gap:6px;padding-inline:8px}
   .mobile-cta .btn{font-size:.78rem;padding:.7rem .35rem;gap:.35rem}
   .mobile-cta .btn svg{display:none}
