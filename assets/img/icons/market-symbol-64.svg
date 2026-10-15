@@ -1,0 +1,15 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="symbol/market-symbol-64" clip-path="url(#clip0)">
+<g id="market-64">
+<g id="Icon">
+<path id="Bag" d="M3.98581 49.9827C3.54493 53.0701 5.94064 55.8322 9.05934 55.8322H54.9407C58.0594 55.8322 60.4551 53.0701 60.0142 49.9827L54.6714 12.5683C54.3108 10.0434 52.1484 8.16781 49.5979 8.16781H14.4021C11.8516 8.16781 9.68915 10.0434 9.32859 12.5683L3.98581 49.9827Z" fill="#96D3FF"/>
+<path id="Line" d="M46.4248 18.7599C44.3678 24.9228 38.6865 29.352 32 29.352C25.3135 29.352 19.6322 24.9228 17.5753 18.7599" stroke="#222222" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+<defs>
+<clipPath id="clip0">
+<rect width="64" height="64" fill="white"/>
+</clipPath>
+</defs>
+</svg>

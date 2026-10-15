@@ -1,0 +1,13 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="zakupki-512">
+<g id="zakupki-64">
+<g id="Base">
+<rect id="Rectangle Rounded" width="512" height="512" rx="128" fill="#4E7BF9"/>
+</g>
+<g id="Icon">
+<path id="Union" fill-rule="evenodd" clip-rule="evenodd" d="M333.811 329.452C362.105 305.21 395.119 276.926 399.572 219.146C405.964 136.211 339.985 72 256 72C172.015 72 106.036 136.211 112.428 219.146C116.881 276.926 149.895 305.21 178.189 329.452C191.465 340.825 203.701 351.309 211.462 363.531C204.586 367.752 200 375.34 200 384V424C200 437.255 210.745 448 224 448H288C301.255 448 312 437.255 312 424V384C312 375.34 307.414 367.752 300.538 363.531C308.299 351.309 320.535 340.825 333.811 329.452Z" fill="white"/>
+<path id="Vector" d="M232 360H280" stroke="#222222" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+</svg>

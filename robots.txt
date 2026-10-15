@@ -1,0 +1,25 @@
+# Файл robots.txt — ИП Девятова С.С.
+# Адрес сайта: https://system785.github.io/ipdss/
+
+User-agent: *
+Allow: /
+
+User-agent: Scanfactory
+Disallow: /
+
+User-agent: Serpstatbot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+Disallow: /*_openstat
+Disallow: /assets/js/
+Disallow: /build.py
+
+Host: https://system785.github.io/ipdss/
+
+Sitemap: https://system785.github.io/ipdss/sitemap.xml
